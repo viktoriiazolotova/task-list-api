@@ -1,7 +1,8 @@
 from app import db
 from app.models.task import Task
 from flask import abort, Blueprint, jsonify, make_response, request
-# from sqlalchemy import asc
+from datetime import datetime
+
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks" )
 
 @tasks_bp.route("", methods = ["GET"])
@@ -60,6 +61,27 @@ def update_one_task(task_id):
         # return make_response(jsonify({"task": f"Invalid data"}), 200)
     db.session.commit()
     return make_response(jsonify({"task": updated_task.to_dict()}), 200)
+
+
+@tasks_bp.route("/<task_id>/mark_complete", methods= ["PATCH"])
+def mark_complete_one_task(task_id):
+    completed_task = get_task_from_id(task_id)
+    completed_task.completed_at = datetime.now()
+    completed_task.is_complete = True
+    db.session.commit()
+    return make_response(jsonify({"task": completed_task.to_dict()}), 200)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods= ["PATCH"])
+def mark_incomplete_one_task(task_id):
+    completed_task = get_task_from_id(task_id)
+    completed_task.is_complete = False
+    completed_task.completed_at = None
+    db.session.commit()
+    return make_response(jsonify({"task": completed_task.to_dict()}), 200)    
+    
+
+
+
 
 @tasks_bp.route('/<task_id>', methods=['DELETE'])
 def delete_one_task(task_id):
