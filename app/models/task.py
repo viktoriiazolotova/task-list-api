@@ -14,6 +14,14 @@ class Task(db.Model):
             "description": self.description,
             "is_complete": True if self.completed_at else False
             }
+
+    @classmethod
+    def from_dict(cls, task_dict):
+        return cls(title = task_dict["title"],
+                   description=task_dict["description"])
+        
+        
+        ##### is possible to do this way?
         # return {
         #     "task":
         #     {
@@ -24,3 +32,4 @@ class Task(db.Model):
         #     }
         # }
     
+

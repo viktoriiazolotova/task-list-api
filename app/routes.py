@@ -2,6 +2,8 @@ from app import db
 from app.models.task import Task
 from flask import abort, Blueprint, jsonify, make_response, request
 from datetime import datetime
+from .slack_bot import send_message_to_slack ### ask is it ok to have like this?
+
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks" )
 
@@ -68,6 +70,8 @@ def mark_complete_one_task(task_id):
     completed_task = get_task_from_id(task_id)
     completed_task.completed_at = datetime.now()
     completed_task.is_complete = True
+    text_to_slack = f"Someone just completed the task {completed_task.title}."
+    send_message_to_slack(text_to_slack)
     db.session.commit()
     return make_response(jsonify({"task": completed_task.to_dict()}), 200)
 
@@ -106,3 +110,6 @@ def get_task_from_id(task_id):
         return abort(make_response({"msg": f"Can not find task id {task_id}"}, 404
  ))
     return choosen_task
+
+
+
