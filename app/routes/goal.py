@@ -1,5 +1,6 @@
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from flask import abort, Blueprint, jsonify, make_response, request
 from .validation import get_model_from_id
 
@@ -53,3 +54,35 @@ def delete_one_goal(goal_id):
     db.session.commit()
     return jsonify({"details": f'Goal {goal_id} "{goal_to_delete.title}" successfully deleted'}), 200
 
+@goals_bp.route('/<goal_id>/tasks', methods = ["POST"])
+def add_tasks_ids_to_goal(goal_id):
+    goal = get_model_from_id(Goal, goal_id)
+    request_body = request.get_json()
+    given_task_ids = request_body["task_ids"]
+    
+    tasks_ids_list = []
+    for task_id in given_task_ids:
+        task = get_model_from_id(Task, task_id)
+        task.goal_id = goal.goal_id
+        tasks_ids_list.append(task.task_id)
+   
+    db.session.commit()
+   
+    return jsonify({"id": goal.goal_id, "task_ids": tasks_ids_list}), 200
+
+@goals_bp.route('/<goal_id>/tasks', methods = ["GET"])
+def get_all_tasks_by_goal(goal_id):
+    goal = get_model_from_id(Goal, goal_id)
+    
+
+    tasks = goal.get_task_ids_list()
+    # if not goal.tasks:
+    #     return jsonify({
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": []
+    # }), 200 
+
+
+    
+    return jsonify(goal.to_dict()), 200  

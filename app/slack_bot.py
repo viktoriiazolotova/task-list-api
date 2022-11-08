@@ -4,9 +4,9 @@ import requests
 
 load_dotenv()
 
-SLACK_API_URL = os.environ.get("SLACK_API_URL")
+SLACK_API_URL = "https://slack.com/api/chat.postMessage"
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
-SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL")
+SLACK_CHANNEL = "task-notifications"
 
 
 def send_message_to_slack(text):
