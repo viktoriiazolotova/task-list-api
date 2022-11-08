@@ -4,23 +4,23 @@ import requests
 
 load_dotenv()
 
-SLACK_API_URL= "https://slack.com/api/chat.postMessage" # is this needs to be in .env?
+SLACK_API_URL = os.environ.get("SLACK_API_URL")
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
-CHANNEL = "task-notifications"
-# CHANNEL = "C049V3YP1BK" #is this needs to be in .env?
-
-
+SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL")
 
 
 def send_message_to_slack(text):
-    query_params = {"text": text, "channel": CHANNEL}
+    query_params = {"text": text, "channel": SLACK_CHANNEL}
     headers={'Authorization': SLACK_BOT_TOKEN}
     response = requests.post(
                     url=SLACK_API_URL, 
                     data= query_params,
                     headers= headers)
     return response.json(), 200 #### what is to return?
-    
+
+    # what is the good place for this file.
+
+# testing function    
 # text = "Hello"
 # print(send_message_to_slack(text))
-#### what is the best place for this file? in app is ok?
+

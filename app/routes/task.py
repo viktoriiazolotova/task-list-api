@@ -2,7 +2,8 @@ from app import db
 from app.models.task import Task
 from flask import abort, Blueprint, jsonify, make_response, request
 from datetime import datetime
-from .slack_bot import send_message_to_slack ### ask is it ok to have like this?
+from ..slack_bot import send_message_to_slack 
+from .validation import get_model_from_id
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks" )
@@ -27,7 +28,7 @@ def get_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods = ["GET"])
 def get_one_task(task_id):
-    choosen_task = get_task_from_id(task_id)
+    choosen_task = get_model_from_id(Task,task_id)
     return jsonify({"task": choosen_task.to_dict()}), 200
     # return jsonify({[choosen_task.to_dict()["task"]]}), 200
 
@@ -35,10 +36,10 @@ def get_one_task(task_id):
 def create_one_task():
     request_body = request.get_json()
     try:
-        new_task = Task(title= request_body["title"],
-                        description=request_body["description"])
+        new_task = Task.from_dict(request_body)
     except KeyError:
         return jsonify({"details": "Invalid data"}), 400
+    
     db.session.add(new_task)
     db.session.commit()
 
@@ -47,7 +48,7 @@ def create_one_task():
 
 @tasks_bp.route("/<task_id>", methods= ["PUT"])
 def update_one_task(task_id):
-    updated_task = get_task_from_id(task_id)
+    updated_task = get_model_from_id(Task,task_id)
     request_body = request.get_json()
     
     list_keys = ["title", "description"]
@@ -60,16 +61,15 @@ def update_one_task(task_id):
             if key not in request_body:
                 str_resp += key + " "
         return make_response(f"Task #{task_id} missing {str_resp.strip()}", 200)
-        # return make_response(jsonify({"task": f"Invalid data"}), 200)
+        
     db.session.commit()
     return make_response(jsonify({"task": updated_task.to_dict()}), 200)
 
 
 @tasks_bp.route("/<task_id>/mark_complete", methods= ["PATCH"])
 def mark_complete_one_task(task_id):
-    completed_task = get_task_from_id(task_id)
+    completed_task = get_model_from_id(Task,task_id)
     completed_task.completed_at = datetime.now()
-    completed_task.is_complete = True
     text_to_slack = f"Someone just completed the task {completed_task.title}."
     send_message_to_slack(text_to_slack)
     db.session.commit()
@@ -77,39 +77,20 @@ def mark_complete_one_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods= ["PATCH"])
 def mark_incomplete_one_task(task_id):
-    completed_task = get_task_from_id(task_id)
-    completed_task.is_complete = False
+    completed_task = get_model_from_id(Task,task_id)
     completed_task.completed_at = None
     db.session.commit()
     return make_response(jsonify({"task": completed_task.to_dict()}), 200)    
     
-
-
-
-
 @tasks_bp.route('/<task_id>', methods=['DELETE'])
 def delete_one_task(task_id):
-    task_to_delete = get_task_from_id(task_id)
+    task_to_delete = get_model_from_id(Task,task_id)
 
     db.session.delete(task_to_delete)
     db.session.commit()
-
     return jsonify({"details": f'Task {task_id} "{task_to_delete.title}" successfully deleted'}), 200
 
 
-
-def get_task_from_id(task_id):
-    try:
-        task_id = int(task_id)
-    except ValueError:
-        return abort(make_response({"msg":f'Invalid data type: {task_id}'}, 400))
-
-    choosen_task = Task.query.get(task_id)
-
-    if choosen_task is None:
-        return abort(make_response({"msg": f"Can not find task id {task_id}"}, 404
- ))
-    return choosen_task
 
 
 
