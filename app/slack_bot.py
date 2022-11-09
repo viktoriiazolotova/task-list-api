@@ -16,13 +16,9 @@ def send_message_to_slack(text):
                     url=SLACK_API_URL, 
                     data= query_params,
                     headers= headers)
-    # return response.json(), 200 
+    
     return response
-    #### what is to return?
+    
 
-    # what is the good place for this file.
 
-# testing function    
-# text = "Hello"
-# print(send_message_to_slack(text))
 

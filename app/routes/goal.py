@@ -73,16 +73,5 @@ def add_tasks_ids_to_goal(goal_id):
 @goals_bp.route('/<goal_id>/tasks', methods = ["GET"])
 def get_all_tasks_by_goal(goal_id):
     goal = get_model_from_id(Goal, goal_id)
-    
-
     tasks = goal.get_task_ids_list()
-    # if not goal.tasks:
-    #     return jsonify({
-    #     "id": goal.goal_id,
-    #     "title": goal.title,
-    #     "tasks": []
-    # }), 200 
-
-
-    
     return jsonify(goal.to_dict_with_tasks()), 200  
