@@ -14,10 +14,14 @@ class Goal(db.Model):
     def to_dict(self):
         goal_dict = {"id": self.goal_id,
                 "title": self.title}
-        if self.tasks :
-            goal_dict["tasks"] = self.get_task_ids_list()
-        # elif len(self.tasks) == 0:
-        #      goal_dict["tasks"] = []
+        
+        return goal_dict
+
+    def to_dict_with_tasks(self):
+        goal_dict = {"id": self.goal_id,
+                "title": self.title,
+                "tasks": self.get_task_ids_list()}
+        
         return goal_dict
 
     def get_task_ids_list(self):

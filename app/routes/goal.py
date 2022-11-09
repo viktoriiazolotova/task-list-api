@@ -85,4 +85,4 @@ def get_all_tasks_by_goal(goal_id):
 
 
     
-    return jsonify(goal.to_dict()), 200  
+    return jsonify(goal.to_dict_with_tasks()), 200  
