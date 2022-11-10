@@ -1,6 +1,9 @@
 from app import db
 
 class Goal(db.Model):
+    '''
+    A class to represent a goal with attributes: goal_id, title and list of tasks.
+    '''
     goal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
     tasks = db.relationship('Task', back_populates = "goal", lazy = True)
@@ -17,7 +20,6 @@ class Goal(db.Model):
         return goal_dict
 
     def get_task_ids_list(self):
-
         return [task.to_dict() for task in self.tasks]
 
     @classmethod

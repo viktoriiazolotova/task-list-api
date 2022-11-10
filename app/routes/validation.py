@@ -1,6 +1,5 @@
 from flask import abort, make_response
 
-
 def get_model_from_id(cls, model_id):
     try:
         model_id = int(model_id)

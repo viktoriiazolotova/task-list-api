@@ -10,6 +10,10 @@ SLACK_CHANNEL = "task-notifications"
 
 
 def send_message_to_slack(text):
+    '''
+    Function takes a parameter text as string and sends it 
+    to the given slack channel.
+    '''
     query_params = {"text": text, "channel": SLACK_CHANNEL}
     headers={'Authorization': SLACK_BOT_TOKEN}
     response = requests.post(
